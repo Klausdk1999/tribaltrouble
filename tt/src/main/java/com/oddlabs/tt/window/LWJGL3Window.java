@@ -12,6 +12,10 @@ import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
+import java.awt.Taskbar;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -283,16 +287,17 @@ public final class LWJGL3Window implements Window {
                             + " Reason: " + STBImage.stbi_failure_reason());
                     return;
                 }
+                try {
+                    GLFWImage.Buffer icons = GLFWImage.malloc(1, stack);
+                    icons.position(0);
+                    icons.width(w.get(0));
+                    icons.height(h.get(0));
+                    icons.pixels(image);
 
-                GLFWImage.Buffer icons = GLFWImage.malloc(1, stack);
-                icons.position(0);
-                icons.width(w.get(0));
-                icons.height(h.get(0));
-                icons.pixels(image);
-
-                glfwSetWindowIcon(windowHandle, icons);
-
-                STBImage.stbi_image_free(image);
+                    glfwSetWindowIcon(windowHandle, icons);
+                } finally {
+                    STBImage.stbi_image_free(image);
+                }
             }
         } else {
             // macOS dock icon — GLFW does not handle it; AWT does.
@@ -302,16 +307,16 @@ public final class LWJGL3Window implements Window {
 
     private static void setMacDockIconIfPossible(@NonNull Path imagePath) {
         try {
-            if (!java.awt.Taskbar.isTaskbarSupported()) return;
-            java.awt.Taskbar tb = java.awt.Taskbar.getTaskbar();
-            if (!tb.isSupported(java.awt.Taskbar.Feature.ICON_IMAGE)) return;
-            java.awt.image.BufferedImage img = javax.imageio.ImageIO.read(imagePath.toFile());
+            if (!Taskbar.isTaskbarSupported()) return;
+            Taskbar tb = Taskbar.getTaskbar();
+            if (!tb.isSupported(Taskbar.Feature.ICON_IMAGE)) return;
+            BufferedImage img = ImageIO.read(imagePath.toFile());
             if (img == null) {
                 logger.warning(() -> "Failed to decode macOS dock icon: " + imagePath);
                 return;
             }
             tb.setIconImage(img);
-        } catch (java.io.IOException | UnsupportedOperationException | SecurityException e) {
+        } catch (IOException | UnsupportedOperationException | SecurityException e) {
             logger.log(Level.WARNING, "macOS dock icon could not be set", e);
         }
     }
