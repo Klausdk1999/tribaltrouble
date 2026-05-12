@@ -898,7 +898,8 @@ public final class Renderer implements AutoCloseable {
             if (!Files.exists(iconPath)) {
                 iconPath = Path.of("../assets/icons/icon.png");
             }
-            logger.info("Setting icon from: " + iconPath.toAbsolutePath());
+            Path icon = iconPath;
+            logger.info(() -> "Setting icon from: " + icon.toAbsolutePath());
             window.setIcon(iconPath);
 
             int[] physSize = window.getMonitorPhysicalSize();

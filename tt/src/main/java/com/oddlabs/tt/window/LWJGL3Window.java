@@ -15,7 +15,6 @@ import org.lwjgl.system.MemoryUtil;
 import java.awt.Taskbar;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import javax.imageio.ImageIO;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -28,6 +27,7 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javax.imageio.ImageIO;
 
 import static org.lwjgl.glfw.GLFW.GLFW_DECORATED;
 import static org.lwjgl.glfw.GLFW.GLFW_AUTO_ICONIFY;
@@ -146,7 +146,7 @@ public final class LWJGL3Window implements Window {
             glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
         }
 
-        if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+        if (System.getProperty("os.name", "").toLowerCase().contains("mac")) {
             glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_TRUE);
         }
 
